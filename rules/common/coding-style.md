@@ -52,10 +52,12 @@ MANY SMALL FILES > FEW LARGE FILES:
 
 ALWAYS handle errors comprehensively:
 
-- Handle errors explicitly at every level
-- Provide user-friendly error messages in UI-facing code
 - Log detailed error context on the server side
 - Never silently swallow errors
+- Catch errors where they can be handled meaningfully
+- Preserve useful context when rethrowing errors
+- Return actionable user-facing errors without exposing internal implementation details
+- Log unexpected errors using the project's logging infrastructure
 
 ## Input Validation
 
@@ -87,6 +89,12 @@ Use named constants for meaningful thresholds, delays, and limits.
 ### Long Functions
 
 Split large functions into focused pieces with clear responsibilities.
+
+## Comments
+
+- Prefer self-explanatory code over comments
+- Add comments only when explaining non-obvious intent, tradeoffs, or business rules
+- Keep comments synchronized with the code
 
 ## Code Quality Checklist
 
