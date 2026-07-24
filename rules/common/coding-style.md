@@ -70,11 +70,36 @@ ALWAYS validate at system boundaries:
 
 ## Naming Conventions
 
-- Variables and functions: `camelCase` with descriptive names
+- Variables: names are nouns; use a plural noun for arrays
+- Functions: names imply an action (`getUsers`, `calculateInterestRate`). Prefer prefixing with a verb.
 - Booleans: prefer `is`, `has`, `should`, or `can` prefixes
-- Interfaces, types, and components: `PascalCase`
 - Constants: `UPPER_SNAKE_CASE`
-- Custom hooks: `camelCase` with a `use` prefix
+- Avoid using values in names. Prefer names that communicate meaning instead `30daysFromNow` -> `timeUntilExpiry`
+
+Do NOT use abbreviations unless they are well-known industry standards:
+
+WRONG: Unclear abbreviated names
+
+```ts
+getTxn();
+calculateCustScore();
+const cust = getCustomer();
+const usr = getUser();
+const cfg = loadConfiguration();
+```
+
+GOOD: Clear names, only well-known abbreviations used
+
+```ts
+getTransaction();
+calculateCustomerScore();
+const customer = getCustomer();
+const user = getUser();
+const config = loadConfiguration();
+
+const serverMBUsage = calculateMBUsage(); // MB is a well-known abbreviation.
+const apiUrl = getApiUrl(); // API and URL are well-known abbreviations.
+```
 
 ## Code Smells to Avoid
 
@@ -95,15 +120,3 @@ Split large functions into focused pieces with clear responsibilities.
 - Prefer self-explanatory code over comments
 - Add comments only when explaining non-obvious intent, tradeoffs, or business rules
 - Keep comments synchronized with the code
-
-## Code Quality Checklist
-
-Before marking work complete:
-
-- [ ] Code is readable and well-named
-- [ ] Functions are small (<50 lines)
-- [ ] Files are focused (<300 lines)
-- [ ] No deep nesting (>4 levels)
-- [ ] Proper error handling
-- [ ] No hardcoded values (use constants or config)
-- [ ] No mutation (immutable patterns used)

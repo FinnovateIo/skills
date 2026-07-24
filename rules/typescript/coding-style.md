@@ -51,9 +51,9 @@ type UserWithRole = User & {
 };
 ```
 
-### Avoid `any`
+### NEVER use `any`
 
-- Avoid `any` in application code
+- NEVER use `any` in application code
 - Use `unknown` for external or untrusted input, then narrow it safely
 - Use generics when a value's type depends on the caller
 
@@ -90,8 +90,9 @@ export function formatUser(user) {
 
 ## Naming
 
-- Function names imply an action (`getUsers`, `calculateInterestRate`)
-- Variable names are nouns; use a plural noun for arrays
+- Variables and functions: `camelCase`
+- Interfaces, types, and components: `PascalCase`
+- Constants: `UPPER_SNAKE_CASE`
 
 ## Variable Declarations
 
@@ -123,18 +124,34 @@ function updateUser(user: Readonly<User>, name: string): User {
 }
 ```
 
-## Error Handling
+## Asynchronous Code
 
-Use async/await with try-catch and narrow unknown errors safely:
+- Prefer `async`/`await` over chained `.then()` calls for readability.
+- Add explicit `Promise<T>` return types to asynchronous functions.
+- Await every Promise unless it is intentionally being run in the background.
+- Do not ignore Promises accidentally. Unawaited Promises can cause lost work, unhandled rejections, or race conditions.
+- In serverless environments, always await asynchronous work before returning from a handler. The runtime may freeze or terminate after the handler completes, causing pending operations to be cancelled.
+- If a Promise is intentionally not awaited, make the intent explicit (for example, using `void` or a platform-specific background task API).
+- Avoid mixing `await` with `.then()` in the same function.
 
 ```typescript
-type User = {
-  id: string;
-  email: string;
-};
+async function loadUser(userId: string): Promise<User> {
+  const user = await fetchUser(userId);
+  return user;
+}
+```
 
-declare function riskyOperation(userId: string): Promise<User>;
+## Error Handling
 
+- Treat caught errors as `unknown` and narrow them before accessing properties.
+- Never assume caught errors are instances of `Error`; JavaScript allows throwing any value.
+- Use `instanceof Error` or custom type guards to safely access error properties.
+- Extract reusable error-narrowing helpers when the same logic is needed in multiple places.
+- Preserve original error context when rethrowing errors by using `Error` causes.
+- Use `await` when returning promises inside `try/catch` blocks so asynchronous errors are caught correctly.
+- Avoid swallowing errors unless there is a deliberate reason and the failure is handled appropriately.
+
+```typescript
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
@@ -143,27 +160,18 @@ function getErrorMessage(error: unknown): string {
   return 'Unexpected error';
 }
 
-const logger = {
-  error: (message: string, error: unknown) => {
-    // Replace with your production logger (for example, pino or winston).
-  }
-};
-
 async function loadUser(userId: string): Promise<User> {
   try {
-    const result = await riskyOperation(userId);
-    return result;
+    return await riskyOperation(userId);
   } catch (error: unknown) {
-    logger.error('Operation failed', error);
-    throw new Error(getErrorMessage(error));
+    logger.error('Operation failed', { error });
+
+    throw new Error(getErrorMessage(error), {
+      cause: error
+    });
   }
 }
 ```
-
-- Catch errors where they can be handled meaningfully
-- Preserve useful context when rethrowing errors
-- Return actionable user-facing errors without exposing internal implementation details
-- Log unexpected errors using the project's logging infrastructure
 
 ## Input Validation
 
@@ -200,12 +208,7 @@ JS doesn't reliably support tail-call optimization — prefer loops over recursi
 
 Avoid relying on hoisting. Write code so everything referenced on a line is already defined above it.
 
-## Browser Compatibility (Legacy Targets)
-
-On projects that still target IE11, avoid ES2015+ array/string methods without a guaranteed polyfill (`includes()`, `find()`, etc.) in favor of long-supported equivalents (e.g. `indexOf()`).
-
 ## Console.log
 
 - No `console.log` statements in production code
 - Use proper logging libraries instead
-- See hooks for automatic detection
