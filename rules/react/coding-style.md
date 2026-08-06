@@ -148,7 +148,3 @@ If a child component is only used by a single parent, keep it inside a `componen
 
 - Use `.svg` for vector-based assets such as icons
 - Use `.png` or `.jpg` for photos
-
-## Dependencies
-
-Install React packages as `devDependencies`, not `dependencies`. Some cloud/build environments install `dependencies` before the runtime starts — don't ship libraries that aren't needed in prod.
