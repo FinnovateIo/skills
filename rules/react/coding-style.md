@@ -1,12 +1,13 @@
 ---
 paths:
-  - "**/*.tsx"
-  - "**/*.jsx"
-  - "**/components/**/*.ts"
-  - "**/components/**/*.js"
-  - "**/hooks/**/*.ts"
-  - "**/hooks/**/*.js"
+  - '**/*.tsx'
+  - '**/*.jsx'
+  - '**/components/**/*.ts'
+  - '**/components/**/*.js'
+  - '**/hooks/**/*.ts'
+  - '**/hooks/**/*.js'
 ---
+
 # React Coding Style
 
 > This file extends [typescript/coding-style.md](../typescript/coding-style.md) and [common/coding-style.md](../common/coding-style.md) with React specific content.
@@ -57,19 +58,31 @@ export function UserCard({ user, onSelect }: UserCardProps) {
 
 ```tsx
 // Prefer
-const greeting = user.isAdmin ? "Welcome, admin" : `Hello ${user.name}`;
+const greeting = user.isAdmin ? 'Welcome, admin' : `Hello ${user.name}`;
 return <h1>{greeting}</h1>;
 
 // Over
-return <h1>{user.isAdmin ? "Welcome, admin" : `Hello ${user.name}`}</h1>;
+return <h1>{user.isAdmin ? 'Welcome, admin' : `Hello ${user.name}`}</h1>;
 ```
 
 ## Server / Client Boundary (Next.js App Router, RSC)
 
-- Default a new file to Server Component — only add `"use client"` when the file uses state, effects, refs, browser APIs, or event handlers
+- Default every new component to a Server Component.
+- Only add `"use client"` if the file directly uses:
+  - React state (`useState`, `useReducer`)
+  - Effects (`useEffect`, `useLayoutEffect`)
+  - Refs (`useRef`)
+  - Browser APIs (`window`, `document`, `localStorage`, etc.)
+  - Event handlers (`onClick`, `onChange`, etc.)
+  - Client-only hooks (e.g. `useRouter`, `useSearchParams`)
+- Before adding `"use client"`, determine whether only part of the component is interactive.
+  - If so, extract the interactive portion into its own Client Component.
+  - Keep the parent as a Server Component whenever possible.
+- Minimize the size of Client Components. They should contain only the code that must run in the browser.
 - Place the `"use client"` directive on line 1, before any imports
 - Never import a Client Component file from inside a `"use server"` action file
 - Never re-export server-only code through a client module — the bundler will silently include it
+- Never add `"use client"` in `page.tsx` or `layout.tsx` as metadata cannot be added to client components
 
 ## Imports
 
