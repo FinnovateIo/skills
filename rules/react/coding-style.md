@@ -131,7 +131,13 @@ components/UserCard/
   UserCard.tsx
   userCard.module.css   # or userCard.module.scss if project is using scss
   UserCard.test.tsx     # Only if the project has existing tests
-  index.ts              # re-export only — points to the component, or to a Redux container
+  components/           # Child components used only by UserCard
+    UserAvatar/
+      ...
+  hooks/
+    useUserCard.ts
+  services/
+    userCard.service.ts
 ```
 
 Inline single-file components are fine for trivial presentational pieces.
