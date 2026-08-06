@@ -129,7 +129,7 @@ Forbidden in new code. Use function components for all new code. Avoid `.bind(th
 ```
 components/UserCard/
   UserCard.tsx
-  UserCard.module.css   # or UserCard.module.scss if project is using scss
+  userCard.module.css   # or userCard.module.scss if project is using scss
   UserCard.test.tsx     # Only if the project has existing tests
   index.ts              # re-export only — points to the component, or to a Redux container
 ```
