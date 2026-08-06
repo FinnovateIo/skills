@@ -51,6 +51,8 @@ Before **any** commit, verify:
   - Secrets or configuration values
 - Log unexpected server-side errors for investigation.
 
+See [error-handling.md](./error-handling.md) for how to write error messages that are specific enough to be useful without leaking any of the above.
+
 ---
 
 ## Resource Protection
