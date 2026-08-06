@@ -69,6 +69,6 @@ If a security issue is discovered:
 1. Stop development immediately.
 2. Assess the severity.
 3. Fix all critical vulnerabilities before continuing.
-4. Rotate any exposed credentials.
+4. Alert the user that they MUST rotate exposed credentials. Do NOT attempt to do this yourself.
 5. Review the codebase for similar vulnerabilities.
 6. Add or update tests to prevent regressions.
