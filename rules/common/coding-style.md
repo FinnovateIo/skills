@@ -50,14 +50,7 @@ MANY SMALL FILES > FEW LARGE FILES:
 
 ## Error Handling
 
-ALWAYS handle errors comprehensively:
-
-- Log detailed error context on the server side
-- Never silently swallow errors
-- Catch errors where they can be handled meaningfully
-- Preserve useful context when rethrowing errors
-- Return actionable user-facing errors without exposing internal implementation details
-- Log unexpected errors using the project's logging infrastructure
+See [error-handling.md](./error-handling.md) for the full ruleset
 
 ## Input Validation
 
@@ -67,6 +60,7 @@ ALWAYS validate at system boundaries:
 - Use schema-based validation where available
 - Fail fast with clear error messages
 - Never trust external data (API responses, user input, file content)
+- Never assume an input value exists — handle `null` and `undefined` explicitly at function boundaries
 
 ## Naming Conventions
 
