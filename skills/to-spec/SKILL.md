@@ -1,6 +1,6 @@
 ---
 name: to-spec
-description: Turn the current conversation into a spec and publish it to the project issue tracker — no interview, just synthesis of what you've already discussed.
+description: Turn the current conversation into a spec and save it to disk — no interview, just synthesis of what you've already discussed.
 disable-model-invocation: true
 ---
 
@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user — just synthesize what you already know.
 
-If no explicit issue tracker is set up, check for a `specs` or `prds` folder in the local repo. If it doesn't exist, ask the user where they would like to store the spec, default being a `specs` folder.
+Check for a `specs` folder in the local repo, or similar folder (`prds`, etc.). If it doesn't exist, ask the user where they would like to store the spec, default being a `specs` folder, or if there's an existing folder they'd like to use.
 
 ## Process
 
@@ -18,7 +18,7 @@ If no explicit issue tracker is set up, check for a `specs` or `prds` folder in 
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker.
+3. Write the spec using the template below, then save it to the `specs` folder.
 
 <spec-template>
 
