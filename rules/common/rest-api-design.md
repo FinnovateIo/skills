@@ -9,25 +9,22 @@ These rules describe the contract an API exposes over HTTP. They are independent
 ## Route Paths
 
 - Lowercase only. Never use capital letters in a route path.
-- **Singular nouns, not plural.** `/v1/user`, not `/v1/users`.
-- Hyphens separate words in a path segment: `/v1/bank-account`, never `/v1/bankAccount` or `/v1/bank_account`.
+- Hyphens separate words in a path segment: `/v1/bank-accounts`, never `/v1/bankAccounts` or `/v1/bank_accounts`.
 - Path parameters identify a resource; they are not a place for filters.
-
-> The singular-noun rule is deliberate and runs against the common REST convention of plural collection names. It is a house standard — do not "correct" it.
 
 ```
 WRONG:   GET /v1/Users
-WRONG:   GET /v1/users
+WRONG:   GET /v1/user
 WRONG:   GET /v1/bankAccounts/:id
-CORRECT: GET /v1/user
-CORRECT: GET /v1/bank-account/:id
+CORRECT: GET /v1/users
+CORRECT: GET /v1/bank-accounts/:id
 ```
 
 Use sub-resources for relationships
 
 ```
-GET    /v1/user/:id/order
-POST   /v1/user/:id/order
+GET    /v1/users/:id/orders
+POST   /v1/users/:id/orders
 ```
 
 ## Casing
@@ -44,8 +41,8 @@ The casing convention differs by location, and this is the rule most often viola
 Query parameters use underscores. Capital letters in a query parameter are not acceptable; capital letters in a body are.
 
 ```
-WRONG:   GET /v1/user?isActive=true&createdAfter=2026-01-01
-CORRECT: GET /v1/user?is_active=true&created_after=2026-01-01
+WRONG:   GET /v1/users?isActive=true&createdAfter=2026-01-01
+CORRECT: GET /v1/users?is_active=true&created_after=2026-01-01
 ```
 
 ## Versioning
@@ -53,9 +50,9 @@ CORRECT: GET /v1/user?is_active=true&created_after=2026-01-01
 Every route carries a version prefix. Versioning is what allows a breaking change to ship without breaking existing functionality.
 
 ```
-/v1/user
-/v1/user/:id
-/v1/bank-account/:id/transaction
+/v1/users
+/v1/users/:id
+/v1/bank-accounts/:id/transactions
 ```
 
 1. Non-breaking changes don't need a new version:
@@ -76,47 +73,47 @@ There are many other factors to consider when changing versions, it is NOT accep
 Filters, sorting, and pagination belong in query parameters. **Never send a body with a GET request**
 
 ```
-WRONG:   GET /v1/user
+WRONG:   GET /v1/users
          body: { "isActive": true, "role": "admin" }
 
-CORRECT: GET /v1/user?is_active=true&role=admin
+CORRECT: GET /v1/users?is_active=true&role=admin
 ```
 
 ### Filtering
 
 ```
 # Simple equality
-GET /api/v1/order?status=active&customer_id=abc-123
+GET /api/v1/orders?status=active&customer_id=abc-123
 
 # Comparison operators (use bracket notation)
-GET /api/v1/product?price[gte]=10&price[lte]=100
-GET /api/v1/order?created_at[after]=2025-01-01
+GET /api/v1/products?price[gte]=10&price[lte]=100
+GET /api/v1/orders?created_at[after]=2025-01-01
 
 # Multiple values (comma-separated)
-GET /api/v1/product?category=electronics,clothing
+GET /api/v1/products?category=electronics,clothing
 
 # Nested fields (dot notation)
-GET /api/v1/order?customer.country=US
+GET /api/v1/orders?customer.country=US
 ```
 
 ### Sorting
 
 ```
 # Single field (prefix - for descending)
-GET /api/v1/product?sort=-created_at
+GET /api/v1/products?sort=-created_at
 
 # Multiple fields (comma-separated)
-GET /api/v1/product?sort=-featured,price,-created_at
+GET /api/v1/products?sort=-featured,price,-created_at
 ```
 
 ### Full-Text Search
 
 ```
 # Search query parameter
-GET /api/v1/product?q=wireless+headphones
+GET /api/v1/products?q=wireless+headphones
 
 # Field-specific search
-GET /api/v1/user?email=alice
+GET /api/v1/users?email=alice
 ```
 
 ## HTTP Methods and Status Codes
@@ -160,14 +157,14 @@ Pair every non-2xx status with a specific, useful message — see [error-handlin
 When business logic stacks into layers, express them as a pipeline of independent steps rather than nesting inside a single handler. Each layer stays independently readable and testable, and the handler is left with the work that is actually specific to the route.
 
 ```
-WRONG:   POST /v1/bank-account
+WRONG:   POST /v1/bank-accounts
          handler:
            if no credentials       -> respond 401
            if body invalid         -> respond 422
            if caller not permitted -> respond 403
            create the account
 
-CORRECT: POST /v1/bank-account
+CORRECT: POST /v1/bank-accounts
          authenticate
       -> validate(createBankAccountSchema)
       -> authorize('bank-account:create')
@@ -184,7 +181,7 @@ Rules that apply regardless of framework:
 ### Offset-Based (Simple)
 
 ```
-GET /api/v1/user?page=2&per_page=20
+GET /api/v1/users?page=2&per_page=20
 
 # Implementation
 SELECT * FROM users
@@ -198,7 +195,7 @@ LIMIT 20 OFFSET 20;
 ### Cursor-Based (Scalable)
 
 ```
-GET /api/v1/user?cursor=eyJpZCI6MTIzfQ&limit=20
+GET /api/v1/users?cursor=eyJpZCI6MTIzfQ&limit=20
 
 # Implementation
 SELECT * FROM users
@@ -241,7 +238,7 @@ Rate limiting must use a shared store such as Redis, a gateway, or the platform'
 
 Before marking work complete:
 
-- [ ] Route path is lowercase, singular, and hyphenated
+- [ ] Route path is lowercase, plural, and hyphenated
 - [ ] Correct HTTP method used (GET for reads, POST for creates, etc.)
 - [ ] Route carries a version prefix
 - [ ] Breaking response changes ship as a new version, not an edit to the old one
