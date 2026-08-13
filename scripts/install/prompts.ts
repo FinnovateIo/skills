@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { confirm, input, select } from '@inquirer/prompts';
-import { bold, dim, info } from './ui.js';
-import { ttyStream } from './cli.js';
+import { bold, dim, info } from './ui.ts';
+import { ttyStream } from './cli.ts';
 import type { Context } from '@inquirer/type';
 
 export type ConflictEntry = {
