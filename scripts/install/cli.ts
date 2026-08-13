@@ -85,3 +85,6 @@ export const openTty = () => {
     return null;
   }
 };
+
+export const ttyStream = openTty();
+export const isInteractive = ttyStream !== null;
