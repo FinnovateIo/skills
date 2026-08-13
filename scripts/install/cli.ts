@@ -3,7 +3,7 @@ import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { ReadStream } from 'node:tty';
-import { InstallError, bold } from './ui.js';
+import { InstallError, bold } from './ui.ts';
 
 export const USAGE = `${bold('Finnovate rules and skills installer')}
 
@@ -51,6 +51,7 @@ export const parseOptions = () => {
     if (error instanceof TypeError) {
       throw new InstallError(error.message, ['', USAGE]);
     }
+    throw error;
   }
 };
 
