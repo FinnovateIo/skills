@@ -55,30 +55,13 @@ export const parseOptions = () => {
   }
 };
 
+export type Options = ReturnType<typeof parseOptions>;
+
 export const expandPath = (path: string) =>
   path.startsWith('~/') ? join(homedir(), path.slice(2)) : resolve(path);
 
-// Given a target destination, if it does not exist, find its nearest ancestor and check for write permissions
-export const checkTargetIsWritable = (targetPath: string) => {
-  let path = targetPath;
-
-  while (!existsSync(path)) {
-    const parent = dirname(path);
-    if (parent === path) {
-      break;
-    }
-    path = parent;
-  }
-
-  try {
-    accessSync(path, constants.W_OK);
-  } catch {
-    throw new InstallError(`Cannot write to ${path} — check permissions.`);
-  }
-};
-
 export const openTty = () => {
-  if (process.stdin.isTTY) return null;
+  if (process.stdin.isTTY) return process.stdin;
   try {
     const stream = new ReadStream(openSync('/dev/tty', 'r'));
     return stream;
