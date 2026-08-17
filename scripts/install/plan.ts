@@ -12,10 +12,6 @@ import { resolveConflict, type ConflictAnswer } from './prompts.ts';
 
 export type EntryStatus = 'new' | 'unchanged' | 'conflict';
 export type EntryAction = 'install' | 'skip';
-export type EntryConflictDecision = Extract<
-  ConflictAnswer,
-  'skip' | 'overwrite'
->;
 
 export type PlanEntry = {
   src: string;
@@ -127,61 +123,4 @@ export const executePlan = (
   });
 
   return { installed, skipped };
-};
-
-const resolveConflictDecisions = async (
-  entries: readonly PlanEntry[]
-): Promise<Map<string, EntryConflictDecision>> => {
-  const decisions = new Map<string, EntryConflictDecision>();
-  let persistedDecision: EntryConflictDecision | null = null;
-
-  entries.forEach(async (entry) => {
-    if (persistedDecision) {
-      decisions.set(entry.dest, persistedDecision);
-      return;
-    }
-
-    const answer = await resolveConflict(entry);
-    if (answer === 'skip-all' || answer === 'overwrite-all') {
-      persistedDecision = answer === 'overwrite-all' ? 'overwrite' : 'skip';
-      decisions.set(entry.dest, persistedDecision);
-      return;
-    }
-
-    decisions.set(entry.dest, answer);
-  });
-
-  return decisions;
-};
-
-export const resolveConflicts = async (
-  entries: readonly PlanEntry[],
-  shouldForce: boolean
-): Promise<PlanEntry[]> => {
-  const conflicts = entries.filter((entry) => entry.status === 'conflict');
-
-  if (!conflicts.length || shouldForce) {
-    return shouldForce
-      ? entries.map((entry) =>
-          entry.status === 'conflict' ? { ...entry, action: 'install' } : entry
-        )
-      : [...entries];
-  }
-
-  if (!isInteractive) {
-    warn(
-      `Not running interactively — keeping the ${conflicts.length} existing file(s). Use --force to overwrite.`
-    );
-    return [...entries];
-  }
-
-  heading(`${conflicts.length} file(s) already exist and differ`);
-
-  const decisions = await resolveConflictDecisions(conflicts);
-
-  return entries.map((entry) =>
-    decisions.get(entry.dest) === 'overwrite'
-      ? { ...entry, action: 'install' }
-      : entry
-  );
 };

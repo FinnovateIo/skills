@@ -78,3 +78,18 @@ export const checkPathIsWritable = (targetPath: string) => {
     return false;
   }
 };
+
+export const listImmediateDirectories = (directoryPath: string): string[] => {
+  return readdirSync(directoryPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+};
+
+export const readFile = (dir: string, file: string): string | undefined => {
+  try {
+    return readFileSync(join(dir, file), 'utf8');
+  } catch {
+    return undefined;
+  }
+};

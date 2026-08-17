@@ -1,20 +1,24 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { bold, dim, heading, info, InstallError, warn } from './ui.ts';
-import { isInteractive, type Options } from './cli.ts';
-import { confirmDependencies } from './prompts.ts';
+import { isInteractive } from './cli.ts';
+import {
+  confirmDependencies,
+  resolveConflict,
+  type ConflictAnswer
+} from './prompts.ts';
+import { readFile } from './fileSystem.ts';
+import type { PlanEntry } from './plan.ts';
+
+export type EntryConflictDecision = Extract<
+  ConflictAnswer,
+  'skip' | 'overwrite'
+>;
 
 export type Reference = {
   from: string;
   dependency: string;
-};
-
-export const listImmediateDirectories = (directoryPath: string): string[] => {
-  return readdirSync(directoryPath, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
 };
 
 export const resolveSelection = (
@@ -84,14 +88,6 @@ const getMarkdownFiles = (dir: string): string[] => {
   }
 };
 
-const readFile = (dir: string, file: string): string | undefined => {
-  try {
-    return readFileSync(join(dir, file), 'utf8');
-  } catch {
-    return undefined;
-  }
-};
-
 const findReferences = (contents: string): string[] => {
   const references = new Set<string>();
 
@@ -136,4 +132,61 @@ export const resolveDependencies = async (
     return [...selection];
   }
   return [...new Set([...selection, ...missing])].sort();
+};
+
+const resolveConflictDecisions = async (
+  entries: readonly PlanEntry[]
+): Promise<Map<string, EntryConflictDecision>> => {
+  const decisions = new Map<string, EntryConflictDecision>();
+  let persistedDecision: EntryConflictDecision | null = null;
+
+  entries.forEach(async (entry) => {
+    if (persistedDecision) {
+      decisions.set(entry.dest, persistedDecision);
+      return;
+    }
+
+    const answer = await resolveConflict(entry);
+    if (answer === 'skip-all' || answer === 'overwrite-all') {
+      persistedDecision = answer === 'overwrite-all' ? 'overwrite' : 'skip';
+      decisions.set(entry.dest, persistedDecision);
+      return;
+    }
+
+    decisions.set(entry.dest, answer);
+  });
+
+  return decisions;
+};
+
+export const resolveConflicts = async (
+  entries: readonly PlanEntry[],
+  shouldForce: boolean
+): Promise<PlanEntry[]> => {
+  const conflicts = entries.filter((entry) => entry.status === 'conflict');
+
+  if (!conflicts.length || shouldForce) {
+    return shouldForce
+      ? entries.map((entry) =>
+          entry.status === 'conflict' ? { ...entry, action: 'install' } : entry
+        )
+      : [...entries];
+  }
+
+  if (!isInteractive) {
+    warn(
+      `Not running interactively — keeping the ${conflicts.length} existing file(s). Use --force to overwrite.`
+    );
+    return [...entries];
+  }
+
+  heading(`${conflicts.length} file(s) already exist and differ`);
+
+  const decisions = await resolveConflictDecisions(conflicts);
+
+  return entries.map((entry) =>
+    decisions.get(entry.dest) === 'overwrite'
+      ? { ...entry, action: 'install' }
+      : entry
+  );
 };
