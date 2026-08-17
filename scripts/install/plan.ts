@@ -7,8 +7,6 @@ import {
   listFilesForDir
 } from './fileSystem.ts';
 import { dim, green, heading, info, warn } from './ui.ts';
-import { isInteractive } from './cli.ts';
-import { resolveConflict, type ConflictAnswer } from './prompts.ts';
 
 export type EntryStatus = 'new' | 'unchanged' | 'conflict';
 export type EntryAction = 'install' | 'skip';
