@@ -107,7 +107,7 @@ export const executePlan = (
       skipped++;
 
       if (entry.status === 'conflict') {
-        info(`  ${dim('skip')}     ${entry.relToTarget}`);
+        info(`\t${dim('skip')}\t${entry.relToTarget}`);
       }
 
       return;
@@ -117,8 +117,8 @@ export const executePlan = (
     installed++;
     info(
       shouldDryRun
-        ? `  ${dim('[dry-run]')} ${entry.relToTarget}`
-        : `  ${green('+')}        ${entry.relToTarget}`
+        ? `\t${dim('[dry-run]')}\t${entry.relToTarget}`
+        : `\t${green('+')}\t${entry.relToTarget}`
     );
   });
 

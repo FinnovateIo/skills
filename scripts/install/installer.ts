@@ -33,9 +33,9 @@ export const runInstaller = async (
 
   if (options.list) {
     heading('Rule categories');
-    info(availableRules.map((name) => `  ${name}`).join('\n') || '  (none)');
+    info(availableRules.map((name) => `\t${name}`).join('\n') || '\t(none)');
     heading('Skills');
-    info(availableSkills.map((name) => `  ${name}`).join('\n') || '  (none)');
+    info(availableSkills.map((name) => `\t${name}`).join('\n') || '\t(none)');
     info('');
     return;
   }
@@ -87,10 +87,10 @@ export const runInstaller = async (
   heading(`Installing to ${target}`);
   if (options.link) info(dim(`mode: symlink to ${root}`));
   if (options['dry-run']) info(dim('mode: dry run, nothing will be written'));
-  info(`  ${selectedRules.length} rules: ${selectedRules.join(' ') || '-'}`);
-  info(`  ${selectedSkills.length} skills: ${selectedSkills.join(' ') || '-'}`);
+  info(`\t${selectedRules.length} rules: ${selectedRules.join(' ') || '-'}`);
+  info(`\t${selectedSkills.length} skills: ${selectedSkills.join(' ') || '-'}`);
   info(
-    `  ${planned.length} files — ${totals.new} new, ${totals.unchanged} unchanged, ${totals.conflict} conflicting`
+    `\t${planned.length} files — ${totals.new} new, ${totals.unchanged} unchanged, ${totals.conflict} conflicting`
   );
 
   const resolved = await resolveConflicts(planned, options.force);
@@ -102,12 +102,12 @@ export const runInstaller = async (
 
   if (options['dry-run']) {
     heading('Dry run complete');
-    info(`  ${installed} would be written, ${skipped} would be left untouched`);
+    info(`\t${installed} would be written, ${skipped} would be left untouched`);
   } else {
     heading('Done');
-    info(`  ${installed} installed, ${skipped} left untouched`);
+    info(`\t${installed} installed, ${skipped} left untouched`);
   }
-  info(`  ${cyan(target)}`);
+  info(`\t${cyan(target)}`);
 
   if (options.link && !options['dry-run']) {
     info('');

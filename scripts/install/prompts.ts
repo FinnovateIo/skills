@@ -102,7 +102,7 @@ const showDiff = (entry: ConflictEntry): void => {
   );
 
   if (result.error) {
-    info(dim('  (diff is not available on this system)'));
+    info(dim('\t(diff is not available on this system)'));
     return;
   }
   info(`\n${result.stdout}`);

@@ -119,7 +119,7 @@ export const resolveDependencies = async (
   const missing = uniqueDependencies(references);
   heading('Unresolved references');
   references.forEach(({ from, dependency }) => {
-    info(`  ${dim(from)} -> ../${dependency}/`);
+    info(`\t${dim(from)} -> ../${dependency}/`);
   });
 
   info(`\nReferenced but not selected: ${bold(missing.join(', '))}`);
