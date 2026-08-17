@@ -57,9 +57,6 @@ export const parseOptions = () => {
 
 export type Options = ReturnType<typeof parseOptions>;
 
-export const expandPath = (path: string) =>
-  path.startsWith('~/') ? join(homedir(), path.slice(2)) : resolve(path);
-
 export const openTty = () => {
   if (process.stdin.isTTY) return process.stdin;
   try {
