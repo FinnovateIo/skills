@@ -32,7 +32,7 @@ export const runInstaller = async (
   }
 
   if (options.list) {
-    heading('Rule categories');
+    heading('Rules');
     info(availableRules.map((name) => `\t${name}`).join('\n') || '\t(none)');
     heading('Skills');
     info(availableSkills.map((name) => `\t${name}`).join('\n') || '\t(none)');
