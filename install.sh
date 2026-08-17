@@ -67,7 +67,7 @@ install_dependencies() {
 
   (
     cd "$SCRIPT_DIR"
-    npm install --no-audit --no-fund --loglevel=error
+    npm ci --no-audit --no-fund --loglevel=error
   ) || die "npm install failed. Run it manually in $SCRIPT_DIR and try again."
 
   printf '%sdone%s\n' "$DIM" "$RESET" >&2
