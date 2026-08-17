@@ -140,21 +140,22 @@ const resolveConflictDecisions = async (
   const decisions = new Map<string, EntryConflictDecision>();
   let persistedDecision: EntryConflictDecision | null = null;
 
-  entries.forEach(async (entry) => {
+  for (const entry of entries) {
     if (persistedDecision) {
       decisions.set(entry.dest, persistedDecision);
-      return;
+      continue;
     }
 
     const answer = await resolveConflict(entry);
+
     if (answer === 'skip-all' || answer === 'overwrite-all') {
       persistedDecision = answer === 'overwrite-all' ? 'overwrite' : 'skip';
       decisions.set(entry.dest, persistedDecision);
-      return;
+      continue;
     }
 
     decisions.set(entry.dest, answer);
-  });
+  }
 
   return decisions;
 };
