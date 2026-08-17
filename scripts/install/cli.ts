@@ -1,6 +1,4 @@
-import { accessSync, constants, existsSync, openSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { openSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { ReadStream } from 'node:tty';
 import { InstallError, bold } from './ui.ts';
@@ -57,7 +55,7 @@ export const parseOptions = () => {
 
 export type Options = ReturnType<typeof parseOptions>;
 
-export const openTty = () => {
+const openTty = () => {
   if (process.stdin.isTTY) return process.stdin;
   try {
     const stream = new ReadStream(openSync('/dev/tty', 'r'));
