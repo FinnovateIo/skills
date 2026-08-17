@@ -114,7 +114,7 @@ export const uniqueDependencies = (
 export const resolveDependencies = async (
   selection: readonly string[],
   available: readonly string[],
-  options: Options,
+  shouldForce: boolean,
   rulesDir: string
 ): Promise<string[]> => {
   const references = findUnresolvedReferences(rulesDir, selection, available);
@@ -129,7 +129,7 @@ export const resolveDependencies = async (
   info(`\nReferenced but not selected: ${bold(missing.join(', '))}`);
 
   const include =
-    (!isInteractive && options.force) || (await confirmDependencies(missing));
+    (!isInteractive && shouldForce) || (await confirmDependencies(missing));
 
   if (!include) {
     warn('Continuing without them — those links will not resolve.');
