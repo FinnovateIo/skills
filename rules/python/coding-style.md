@@ -108,16 +108,16 @@ Use `with` for anything that must be released — files, sockets, locks, connect
 ```python
 # Good: Using context managers
 def process_file(path: str) -> str:
-    with open(path, 'r') as f:
-        return f.read()
+    with open(path, 'r') as file:
+        return file.read()
 
 # Bad: Manual resource management
 def process_file(path: str) -> str:
-    f = open(path, 'r')
+    file = open(path, 'r')
     try:
-        return f.read()
+        return file.read()
     finally:
-        f.close()
+        file.close()
 ```
 
 ## Comprehensions and Generators
@@ -139,13 +139,13 @@ Once a comprehension stacks multiple conditions or nested loops, give it a name 
 
 ```python
 # Bad: Too complex to read inline
-result = [x * 2 for x in items if x > 0 if x % 2 == 0]
+result = [item * 2 for item in items if item > 0 if item % 2 == 0]
 
 # Good: Name the intent with a generator function
 def positive_evens_doubled(items: Iterable[int]) -> Iterator[int]:
-    for x in items:
-        if x > 0 and x % 2 == 0:
-            yield x * 2
+    for item in items:
+        if item > 0 and item % 2 == 0:
+            yield item * 2
 ```
 
 ### Generator Expressions
