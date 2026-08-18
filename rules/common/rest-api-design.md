@@ -31,12 +31,12 @@ POST   /v1/users/:id/orders
 
 The casing convention differs by location, and this is the rule most often violated:
 
-| Location        | Casing                   |
-| --------------- | ------------------------ |
-| Route path      | `lowercase-with-hyphens` |
-| Query parameter | `snake_case`             |
-| Request body    | `camelCase`              |
-| Response body   | `camelCase`              |
+| Location        | Casing       |
+| --------------- | ------------ |
+| Route path      | `kebab-case` |
+| Query parameter | `snake_case` |
+| Request body    | `camelCase`  |
+| Response body   | `camelCase`  |
 
 Query parameters use underscores. Capital letters in a query parameter are not acceptable; capital letters in a body are.
 
