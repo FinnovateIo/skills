@@ -4,8 +4,7 @@ import {
   existsSync,
   lstatSync,
   readdirSync,
-  readFileSync,
-  readlinkSync
+  readFileSync
 } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -28,20 +27,6 @@ export const checkFilesHaveSameContents = (
 ): boolean => {
   try {
     return readFileSync(fileA).equals(readFileSync(fileB));
-  } catch {
-    return false;
-  }
-};
-
-export const checkSymLinkToTarget = (
-  filePath: string,
-  targetFilePath: string
-): boolean => {
-  try {
-    return (
-      lstatSync(filePath).isSymbolicLink() &&
-      readlinkSync(filePath) === targetFilePath
-    );
   } catch {
     return false;
   }

@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { parseOptions, USAGE } from './cli.ts';
-import { cyan, dim, heading, info, InstallError, yellow } from './ui.ts';
+import { cyan, dim, heading, info, InstallError } from './ui.ts';
 import {
   resolveConflicts,
   resolveDependencies,
@@ -79,13 +79,12 @@ export const runInstaller = async (
     }))
   ];
 
-  const planned = buildPlan(groups, target, options.link);
+  const planned = buildPlan(groups, target);
   if (planned.length === 0)
     throw new InstallError('No files matched the selection.');
 
   const totals = countByStatus(planned);
   heading(`Installing to ${target}`);
-  if (options.link) info(dim(`mode: symlink to ${root}`));
   if (options['dry-run']) info(dim('mode: dry run, nothing will be written'));
   info(`\t${selectedRules.length} rules: ${selectedRules.join(' ') || '-'}`);
   info(`\t${selectedSkills.length} skills: ${selectedSkills.join(' ') || '-'}`);
@@ -94,11 +93,7 @@ export const runInstaller = async (
   );
 
   const resolved = await resolveConflicts(planned, options.force);
-  const { installed, skipped } = executePlan(
-    resolved,
-    options['dry-run'],
-    options.link
-  );
+  const { installed, skipped } = executePlan(resolved, options['dry-run']);
 
   if (options['dry-run']) {
     heading('Dry run complete');
@@ -108,11 +103,5 @@ export const runInstaller = async (
     info(`\t${installed} installed, ${skipped} left untouched`);
   }
   info(`\t${cyan(target)}`);
-
-  if (options.link && !options['dry-run']) {
-    info('');
-    info(yellow(`Installed as symlinks into ${root}.`));
-    info(yellow('Moving or deleting that directory will break this install.'));
-  }
   info('');
 };

@@ -20,8 +20,6 @@ ${bold('Where to install')}
   --target PATH    Install to an explicit path
 
 ${bold('How to install')}
-  --link           Symlink to this repo instead of copying, so a
-                   'git pull' updates the installed files in place
   --dry-run        Show what would happen, write nothing
   --force          Overwrite conflicting files without prompting
   -h, --help       This message
@@ -36,7 +34,6 @@ export const parseOptions = () => {
         target: { type: 'string' },
         global: { type: 'boolean', default: false },
         local: { type: 'boolean', default: false },
-        link: { type: 'boolean', default: false },
         'dry-run': { type: 'boolean', default: false },
         force: { type: 'boolean', default: false },
         list: { type: 'boolean', default: false },

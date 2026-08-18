@@ -1,9 +1,8 @@
-import { copyFileSync, mkdirSync, rmSync, symlinkSync } from 'node:fs';
+import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import {
   checkFileExists,
   checkFilesHaveSameContents,
-  checkSymLinkToTarget,
   listFilesForDir
 } from './fileSystem.ts';
 import { dim, green, heading, info, warn } from './ui.ts';
@@ -33,28 +32,21 @@ export type Report = {
   skipped: (entry: PlanEntry) => void;
 };
 
-export const classify = (
-  src: string,
-  dest: string,
-  shouldLink: boolean
-): EntryStatus => {
-  if (checkSymLinkToTarget(dest, src)) return 'unchanged';
+export const classify = (src: string, dest: string): EntryStatus => {
   if (!checkFileExists(dest)) return 'new';
-  if (checkFilesHaveSameContents(src, dest))
-    return shouldLink ? 'new' : 'unchanged';
+  if (checkFilesHaveSameContents(src, dest)) return 'unchanged';
   return 'conflict';
 };
 
 export const buildPlan = (
   groups: readonly Group[],
-  target: string,
-  shouldLink: boolean
+  target: string
 ): PlanEntry[] =>
   groups.flatMap(({ sourceRoot, destRoot, prefix }) =>
     listFilesForDir(sourceRoot).map((file) => {
       const src = join(sourceRoot, file);
       const dest = join(destRoot, file);
-      const status = classify(src, dest, shouldLink);
+      const status = classify(src, dest);
       return {
         src,
         dest,
@@ -75,27 +67,17 @@ export const countByStatus = (entries: readonly PlanEntry[]): StatusTotals =>
     { new: 0, unchanged: 0, conflict: 0 }
   );
 
-const installEntry = (
-  entry: PlanEntry,
-  shouldDryRun: boolean,
-  shouldLink: boolean
-): void => {
+const installEntry = (entry: PlanEntry, shouldDryRun: boolean): void => {
   if (shouldDryRun) return;
 
   mkdirSync(dirname(entry.dest), { recursive: true });
   rmSync(entry.dest, { force: true });
-
-  if (shouldLink) {
-    symlinkSync(entry.src, entry.dest);
-  } else {
-    copyFileSync(entry.src, entry.dest);
-  }
+  copyFileSync(entry.src, entry.dest);
 };
 
 export const executePlan = (
   entries: readonly PlanEntry[],
-  shouldDryRun: boolean,
-  shouldLink: boolean
+  shouldDryRun: boolean
 ): { installed: number; skipped: number } => {
   let installed = 0;
   let skipped = 0;
@@ -111,7 +93,7 @@ export const executePlan = (
       return;
     }
 
-    installEntry(entry, shouldDryRun, shouldLink);
+    installEntry(entry, shouldDryRun);
     installed++;
     info(
       shouldDryRun
