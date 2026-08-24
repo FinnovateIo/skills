@@ -2,7 +2,16 @@
 
 set -eo pipefail
 
+REPO=${FINNOVATE_SKILLS_REPO:-FinnovateIo/skills}
+REF=${FINNOVATE_SKILLS_REF:-main}
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SOURCE_PATH=${BASH_SOURCE[0]:-}
+
+IS_LOCAL_CHECKOUT=false
+if [ -n "$SOURCE_PATH" ] && [ -f "$SCRIPT_DIR/install.ts" ]; then
+  IS_LOCAL_CHECKOUT=true
+fi
 
 if [ -t 2 ]; then
   RED=$'\033[31m'
@@ -40,12 +49,33 @@ require_node_version() {
     "$RED" "$(node --version)" "$RESET" >&2
   printf 'Needs Node 24 or newer.\n' >&2
 
-  if [ -f "$SCRIPT_DIR/.nvmrc" ]; then
+  if [ "$IS_LOCAL_CHECKOUT" = true ] && [ -f "$SCRIPT_DIR/.nvmrc" ]; then
     printf 'This repo pins %s — try: nvm use\n' \
       "$(cat "$SCRIPT_DIR/.nvmrc")" >&2
   fi
 
   exit 1
+}
+
+bootstrap_from_remote() {
+  require_command curl "curl is required to download the installer."
+  require_command tar "tar is required to unpack the installer."
+
+  TEMP_CHECKOUT=$(mktemp -d)
+  trap 'rm -rf "$TEMP_CHECKOUT"' EXIT
+
+  printf '%sFetching %s@%s...%s\n' "$YELLOW" "$REPO" "$REF" "$RESET" >&2
+
+  curl -fsSL "https://codeload.github.com/$REPO/tar.gz/$REF" |
+    tar -xz -C "$TEMP_CHECKOUT" --strip-components=1 ||
+    die "Could not download $REPO@$REF. Check that the ref exists."
+
+  [ -f "$TEMP_CHECKOUT/install.ts" ] ||
+    die "Downloaded $REPO@$REF but it does not look like the installer."
+
+  SCRIPT_DIR=$TEMP_CHECKOUT
+
+  printf '%sdone%s\n' "$DIM" "$RESET" >&2
 }
 
 dependencies_are_installed() {
@@ -77,7 +107,11 @@ require_command \
   node \
   "Node.js is required but was not found on PATH."
 
+if [ "$IS_LOCAL_CHECKOUT" = false ]; then
+  bootstrap_from_remote
+fi
+
 require_node_version
 install_dependencies
 
-exec node "$SCRIPT_DIR/install.ts" "$@"
+node "$SCRIPT_DIR/install.ts" "$@"
