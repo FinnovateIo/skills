@@ -111,7 +111,7 @@ const showDiff = (entry: ConflictEntry): void => {
 export const resolveConflict = async (
   entry: ConflictEntry
 ): Promise<ConflictAnswer> => {
-  for (;;) {
+  while (true) {
     const answer = await ask(select<ConflictChoice>, {
       message: `${bold(entry.relToTarget)} ${dim(
         `(existing ${lineCount(entry.dest)} lines, incoming ${lineCount(entry.src)} lines)`

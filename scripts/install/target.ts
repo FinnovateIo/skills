@@ -16,7 +16,7 @@ export const resolveTarget = async (options: Options): Promise<string> => {
     ]);
   }
 
-  for (;;) {
+  while (true) {
     const chosenTarget = expandPath(
       await chooseTarget({ home: homedir(), cwd: process.cwd() })
     );
