@@ -52,6 +52,10 @@ MANY SMALL FILES > FEW LARGE FILES:
 
 See [error-handling.md](./error-handling.md) for the full ruleset
 
+## Testing
+
+See [testing.md](./testing.md) for when and how to write tests
+
 ## Input Validation
 
 ALWAYS validate at system boundaries:
