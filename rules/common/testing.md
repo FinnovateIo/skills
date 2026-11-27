@@ -38,9 +38,9 @@ If you're mocking every module your code interacts with and then asserting again
 
 Keep mocks focused on things that are slow, unpredictable, or outside your control:
 
-Network requests and third-party services
-Time, timers, and random values
-Infrastructure that isn't practical to run in tests
+- Network requests and third-party services
+- Time, timers, and random values
+- Infrastructure that isn't practical to run in tests
 
 Everything else, including your own validators, mappers, and helper functions, should run as it normally would.
 
@@ -105,7 +105,11 @@ Test files follow the same DRY rules as application code. If 20 tests repeat the
 
 - Extract repeated setup into factory or setup functions: `createUser(overrides)`, `renderLoginForm()`, `setupService()`
 - Factories take overrides so each test states only what is different about it
-- Keep helpers simple. No branching logic in test helpers.
+- Before introducing a new helper, check relevant existing tests for similar setup or helpers that can be reused.
+- Keep helpers simple and focused. Avoid branching logic or turning test helpers into their own abstraction layer.
+- Don't create helpers speculatively. Wait until there's actual duplication before extracting them.
+
+The goal is to reduce unnecessary repetition without hiding what each test is actually doing.
 
 ```ts
 // WRONG: identical setup copied into every test
